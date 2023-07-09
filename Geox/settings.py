@@ -94,7 +94,7 @@ TEMPLATES = [
     }
 ]
 
-WSGI_APPLICATION = "Geox.wsgi.application"
+ASGI_APPLICATION = "Geox.asgi.application"
 
 
 # Database
