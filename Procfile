@@ -1,1 +1,1 @@
-web: daphne Geox.asgi:application --port  --bind 0.0.0.0 -v2
+web: daphne Geox.asgi:application --port $PORT --bind 0.0.0.0 -v2
