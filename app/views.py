@@ -625,7 +625,7 @@ def get_min_pay(request):
     min_pay -= company.get_amount()
     return Response({
         'done': True,
-        'result': min_pay,
+        'result': min_pay if min_pay > 0 else 0,
         'key': GeoxDetails.objects.get(key = "kkiapay0" + (":sand" if IS_DEV else "")).value
     })
 
