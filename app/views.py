@@ -783,3 +783,6 @@ def delete_post(request, id) :
         return Response({
             'done' : True,
         })
+
+def privacy(request) :
+    return render(request, 'app/privacy.html', {})

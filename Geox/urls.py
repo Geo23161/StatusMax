@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
 from django.urls.conf import include
-from app.views import handle_click, index
+from app.views import handle_click, index, privacy
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -28,5 +28,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name="token_refresh"),
     path("api/", include('app.urls')),
     path('p/<int:id>/', handle_click, name="handle_clicks"),
-    path('', index, name="index")
+    path('', index, name="index"),
+    path('privacy/', privacy, name='privacy')
 ]+ static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)
