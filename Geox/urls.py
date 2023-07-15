@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
 from django.urls.conf import include
-from app.views import handle_click, index, privacy
+from app.views import handle_click, index, privacy, delete_view
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -29,5 +29,6 @@ urlpatterns = [
     path("api/", include('app.urls')),
     path('p/<int:id>/', handle_click, name="handle_clicks"),
     path('', index, name="index"),
-    path('privacy/', privacy, name='privacy')
+    path('privacy/', privacy, name='privacy'),
+    path('delete/', delete_view, name="delete_story")
 ]+ static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)

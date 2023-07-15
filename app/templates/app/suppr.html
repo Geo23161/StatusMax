@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StatusMax | Supprimer votre compte</title>
+    <link rel="stylesheet" href="{% static 'app/output.css' %}" />
+    <link rel="icon" href="{% static 'app/img/favicon.ico' %}" type="image/x-icon">
+    <link rel="apple-touch-icon" href="{% static 'app/img/apple-touch-icon.png' %}">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Votre propre style CSS peut être ajouté ici */
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="max-w-md w-full px-6 py-8 bg-white shadow-md rounded-lg">
+            {% if has_done %}
+            <div class="bg-green-100 text-green-800 rounded-md px-4 py-2 mb-4">
+                Votre compte a été supprimé avec succès.
+            </div>
+            {% endif %}
+            <h2 class="text-2xl font-bold text-center mb-8">Supprimer votre compte</h2>
+            <form action="" method="post" >
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Adresse e-mail</label>
+                    <input type="email" id="email" name="email" placeholder="Votre adresse e-mail"
+                        class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-red-500">
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>
+                    <input type="password" id="password" name="password" placeholder="Votre mot de passe"
+                        class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-red-500">
+                </div>
+                <div class="flex items-center justify-around">
+                    <button type="submit"
+                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Supprimer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

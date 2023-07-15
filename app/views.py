@@ -786,3 +786,17 @@ def delete_post(request, id) :
 
 def privacy(request) :
     return render(request, 'app/privacy.html', {})
+
+def delete_view(request) :
+    has_done = False
+    if request.method == "POST" :
+        email = request.POST.get('email') 
+        password = request.POST.get('password')
+        us = User.objects.filter(email = email) 
+        if us.exists() :
+            if us.first().check_password(password) :
+                us.delete()
+                has_done = True
+    return render(request, "app/suppr.html", {
+        'has_done' : has_done
+    })
