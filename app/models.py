@@ -22,7 +22,7 @@ def send_by_thread(func):
 def get_value(key) -> str:
     return GeoxDetails.objects.get(key=key).value
 
-IS_DEV = False
+IS_DEV = True
 
 
 class CustomUserManager(BaseUserManager):
@@ -349,7 +349,7 @@ class Payment(models.Model) :
     status = models.CharField(max_length=150, null= True, blank=True)
     montant = models.IntegerField(default=0)
     story = models.ForeignKey(UserStories, related_name="payments", on_delete=models.CASCADE, null=True, blank=True)
-    post = models.OneToOneField(AcceptedPost, null=True, blank=True, on_delete=models.CASCADE )
+    post = models.ForeignKey(AcceptedPost, null=True, blank=True, on_delete=models.CASCADE )
     created_at = models.DateTimeField(auto_now_add=True)
     def get_color(self) :
         return 'green' if self.status == "Effectué" else 'gray'
@@ -463,6 +463,7 @@ def getHeaders(access):
         'Content-Type': 'application/json'
     }
 
+"""
 def get_notif_data(user : User) :
     data = {
         "messaging_product": "whatsapp",
@@ -474,6 +475,33 @@ def get_notif_data(user : User) :
             "language": {
                 "code": "fr"
             }
+        }
+    }
+    return json.dumps(data)
+"""
+
+def get_notif_data(user : User):
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": f"{user.whatsapp}",
+        "type": "template",
+        "template": {
+            "name": "demand_alert",
+            "language": {
+                "code": "fr"
+            },
+            "components": [
+                {
+                    "type": "body",
+                    "parameters": [
+                        {
+                            "type": "text",
+                            "text": "promotion"
+                        }
+                    ]
+                }
+            ]
         }
     }
     return json.dumps(data)
