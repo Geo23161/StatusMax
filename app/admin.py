@@ -20,7 +20,8 @@ def post_media(self, obj) :
 def validate_preuve(modeladmin, request, queryset) :
     for query in queryset :
         query.status = "Resultat validé"
-        Payment.objects.get_or_create(name = "Versement", status = "Effectué", montant = query.payc if query.result >= query.goals else (query.result/10 * int(GeoxDetails.objects.get(key = 'price:10').value)), story = query.story, post = query)
+
+        Payment.objects.get_or_create(name = "Versement", status = "Effectué", montant = query.payc if query.result >= query.goals else (query.result/10 * int(GeoxDetails.objects.get(key = 'price:10:' + query.post.get_media_typ() + ':real').value)), story = query.story, post = query)
         query.payed = True
         query.save()
     

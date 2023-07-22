@@ -7,7 +7,8 @@ import requests
 import json
 from .models import *
 import random
-from .algo import set_audiences, get_point
+from .ip2location import get_quart
+from .algo import set_audiences,  get_new_point
 from .core import Kkiapay
 import time
 
@@ -79,13 +80,12 @@ def whatsapp_auth(request):
     if country:
         request.user.country = country
         request.user.save()
-    """
-    if User.objects.filter(whatsapp = pays_codes_indicatifs[country] + number).exists() :
-        return Response({
-            'done' : False,
-            'reason' : 'Ce numero whatsapp a déja été utilisé.'
-        })
-    """
+    if GeoxDetails.objects.filter(key = 'is:prod').exists() :
+        if User.objects.filter(whatsapp = pays_codes_indicatifs[country] + number).exists() :
+            return Response({
+                'done' : False,
+                'reason' : 'Ce numero whatsapp a déja été utilisé.'
+            })
     number = pays_codes_indicatifs[country] + number
     gd = GeoxDetails.objects.create(
         key="code:user:" + str(request.user.pk), value=get_unique_code())
@@ -146,9 +146,16 @@ def get_register_stp(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_interests(request):
+    boxl = Interest.objects.filter(box = None)
+    restd = {}
+    for box in boxl :
+        restd['inter:' + str(box.pk)] = InterestSerializers(box.subs.all(), many = True).data
+
     return Response({
         'done': True,
-        'result': InterestSerializers(Interest.objects.all(), many=True).data
+        'result': InterestSerializers(Interest.objects.all(), many=True).data,
+        'boxl' : InterestSerializers(boxl, many = True).data,
+        'restd' : restd
     })
 
 
@@ -181,12 +188,15 @@ def create_stories(request):
         story.d_interest.add(interest)
     for prof in my_profs:
         story.professions.add(prof)
-
+    media_id = request.data.get('media_typ')
+    if int(media_id) :
+        media = MediaPost.objects.get(pk = int(media_id))
+        story.picture = media.image.url
+        story.save()
     def find_audiences():
         story = UserStories.objects.get_or_create(user=request.user)[0]
         for campaign in Campaign.objects.all():
-            st = get_point(story, campaign)
-            print(st)
+            st = get_new_point(story, campaign)
             if st['point']:
                 Audiences.objects.create(
                     campaign=campaign, story=st['story'], point=st['point'])
@@ -195,6 +205,14 @@ def create_stories(request):
     send_by_thread(find_audiences)
     return Response({
         'done': True,
+        'result' : story.pk,
+        'quiz' : get_value('quiz:link') + f'{story.pk}/',
+        'quizObj' : {
+            'title' : "Aide-moi à mieux te connaître",
+            'text' : "Je suis maintenant membre de StatusMax, et pour plus de statuts interessant, prends quelques secondes pour repondre à ce quiz afin de me permettre de mieux te connaître.",
+            'url': get_value('quiz:link') + f'{story.pk}/',
+            'dialogTitle' : "Invitez votre audience"
+        }
     })
 
 
@@ -213,7 +231,8 @@ def get_details(request):
             },
             'girls_num': my_story.taille - my_story.men_per,
             'interests': InterestSerializers(my_story.d_interest.all(), many=True).data,
-            'professions': ProfessionSerializers(my_story.professions.all(), many=True).data
+            'professions': ProfessionSerializers(my_story.professions.all(), many=True).data,
+            'picture' : my_story.get_my_picture()
         }
     })
 
@@ -248,7 +267,8 @@ def get_home(request):
     ], key=lambda e: len(e['medias']), reverse=True)
     return Response({
         'done': True,
-        'result': homeObj
+        'result': homeObj,
+        'story' : my_story.pk
     })
 
 
@@ -381,10 +401,11 @@ def get_payments(request):
         'result': {
             'total': my_story.get_total(),
             'dispo': my_story.get_rest(),
-            'price': my_story.price(),
+            'price_image': get_value('price:10:image:real'),
+            'price_video': get_value('price:10:video:real'),
             "payments": PaymentSerializer(my_story.payments.all().order_by("-created_at"), many=True).data,
             "momo": MomoSerializer(my_story.momo).data if my_story.momo else 0,
-
+            
         },
         'has_retr': has_retr
     })
@@ -433,7 +454,8 @@ def get_params(request):
             'whatsapp': my_story.user.whatsapp,
             'momo': MomoSerializer(my_story.momo).data,
             'admin': GeoxDetails.objects.get(key='admin:whatsapp').value,
-            'privacy': GeoxDetails.objects.get(key='privacy_policy').value
+            'privacy': GeoxDetails.objects.get(key='privacy_policy').value,
+            'story' : my_story.pk
         }
     })
 
@@ -461,7 +483,6 @@ def get_posts(request):
             notif.send_now()
     send_by_thread(check_or_create_notif)
     pks = json.loads(request.data.get('pks'))
-    print(request.user, "00000000000000000000")
     return Response({
         'done': True,
         'result': PostBuisSerializer(company.posts.all().exclude(pk__in=pks).order_by('-created_at'), many=True).data,
@@ -508,7 +529,18 @@ def set_budget(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def submit_media(request):
+    typ= request.POST.get('typ')
     image = request.FILES.get('image')
+    if typ == 'profil' :
+        media = MediaPost.objects.create(
+            image=image, name='profil:' + str(request.user.pk))
+        return Response({
+            'done' : True,
+            'result' : {
+                'url' : media.get_url(),
+                'pk' : media.pk
+            }
+        })
     video = request.FILES.get('video')
     id = int(request.POST.get('id'))
     if not id:
@@ -543,7 +575,8 @@ def get_campaigns(request):
     return Response({
         'done': True,
         'result': CampaignSerializer(campagns, many=True).data,
-        'price': GeoxDetails.objects.get(key='price:10').value
+        'price:image': GeoxDetails.objects.get(key='price:10:image').value,
+        'price:video' : GeoxDetails.objects.get(key = 'price:10:video').value
     })
 
 
@@ -551,7 +584,6 @@ def get_campaigns(request):
 @permission_classes([IsAuthenticated])
 def create_campaign(request):
     ages = json.loads(request.data.get('ages'))
-    genre = request.data.get('genre')
     name = request.data.get('name')
     lieux = json.loads(request.data.get('lieux'))
     interests = Interest.objects.all() if request.data.get('interests') == 'all' else Interest.objects.filter(
@@ -559,7 +591,7 @@ def create_campaign(request):
     professions = Profession.objects.all() if request.data.get('professions') == 'all' else Profession.objects.filter(
         pk__in=[interest['id'] for interest in json.loads(request.data.get('professions'))])
     campaign = Campaign.objects.create(quart=json.dumps(
-        lieux), min_age=ages['lower'], max_age=ages['upper'], sex=genre, name=name)
+        lieux), min_age=ages['lower'], max_age=ages['upper'], name=name)
     for inter in interests:
         campaign.interests.add(inter)
     for prof in professions:
@@ -619,16 +651,20 @@ def get_min_pay(request):
     company = request.user.company_in.all().first()
     posts = company.posts.all()
     min_pay = 0
+    proposed = 0
     for post in posts:
         if post.get_status()[0] != "Terminé":
+            price_25 = int(GeoxDetails.objects.get(key = 'price:20:' + post.get_media_typ()).value)
             min_pay += (post.already_used - post.already_payed)
+            proposed += (post.total_invest - post.already_payed) if post.already_used > price_25 * 2.9 else 0
     min_pay -= company.get_amount()
+    proposed -= company.get_amount()
     return Response({
         'done': True,
         'result': min_pay if min_pay > 0 else 0,
-        'key': GeoxDetails.objects.get(key = "kkiapay0" + (":sand" if IS_DEV else "")).value
+        'key': GeoxDetails.objects.get(key = "kkiapay0" + (":sand" if IS_DEV else "")).value,
+        'proposed' : proposed if proposed > 0 else 0
     })
-
 
 def getKkiapay():
     return Kkiapay(val('kkiapay0'+ (":sand" if IS_DEV else "")), val('kkiapay1'+ (":sand" if IS_DEV else "")), val('kkiapay2'+ (":sand" if IS_DEV else "")), sandbox= IS_DEV)
@@ -747,7 +783,7 @@ def get_cparams(request):
     min_pay = 0
     for post in company.posts.all():
         if post.get_status()[0] != "Terminé":
-            min_pay += (post.already_used - post.already_payed) + (25 if post.already_used - post.already_payed else 0 )
+            min_pay += (post.already_used - post.already_payed) 
     min_pay -= company.get_amount()
     params = {
         'name': company.name,
@@ -799,4 +835,94 @@ def delete_view(request) :
                 has_done = True
     return render(request, "app/suppr.html", {
         'has_done' : has_done
+    })
+
+def gamify_interest(request, pk) :
+    story : UserStories = UserStories.objects.get(pk = pk)
+    """
+    ip = request.META['REMOTE_ADDR']
+    try :
+        already_ips = list(json.loads(GeoxDetails.objects.get_or_create(key = "already_reg:" + story.pk)[0]))
+    except :
+        already_ips = []
+    if not (ip in already_ips):
+        already_ips.append(ip)
+    rest_dic = {}
+    box_interests = Interest.objects.all()
+    box_list = [ b.name for b in box_interests if not b.box ]
+    for box in box_list :
+        rest_dic[box] = [i.name for i in Interest.objects.filter(box__name = box)]
+    """
+    api_get = GeoxDetails.objects.get(key = 'api:url').value + "game_list/"
+    api_post = GeoxDetails.objects.get(key = 'api:url').value + "set_games/"
+    return render(request, "app/gamify.html", {
+        'story' : story,
+        'app_link' : GeoxDetails.objects.get(key= 'app:link').value,
+        'api_get' : api_get,
+        'api_post' : api_post
+    })
+
+@api_view(['GET'])
+def game_list(request) :
+    rest_dic = {}
+    box_interests = Interest.objects.all()
+    box_list = [ b.name for b in box_interests if not b.box ]
+    for box in box_list :
+        rest_dic[box] = [i.name for i in Interest.objects.filter(box__name = box)]
+
+    return Response({
+        'done' : True,
+        'result' : {
+            'box_list' : box_list,
+            'rest_dic' : rest_dic
+        }
+    })
+
+@api_view(['POST'])
+def set_games(request) :
+
+    story = UserStories.objects.get(pk = int(request.data.get('story')))
+    boxs = json.loads(request.data.get('boxs'))
+    rests = json.loads(request.data.get('rests'))
+    tots = boxs + rests
+    ip = request.META['REMOTE_ADDR']
+    ciblef = CibleF.objects.get_or_create(ip_address = ip, story = story)[0]
+    reply = request.data.get('reply')
+    if reply :
+        cib = CibleF.objects.get(pk = int(reply))
+        tots = [inter.name for inter in cib.interests.all()]
+    for inter in tots :
+        if not ciblef.interests.all().filter(name = inter).exists() :
+            interObj = Interest.objects.get(name = inter)
+            ciblef.interests.add(interObj)
+            story.d_interest.add(interObj)
+    def set_quart() :
+        ciblef.quart = json.dumps(get_quart(ip))
+        ciblef.save()
+    if not ciblef.quart : send_by_thread(set_quart)
+    return Response({
+        'done' : True,
+        'result' : ciblef.pk
+    })
+
+@api_view(['GET'])
+def cible_stats(request, pk) :
+    story = UserStories.objects.get(pk = pk)
+    total_c = CibleF.objects.filter(story = story).count()
+    cible_per = float(GeoxDetails.objects.get(key = 'cible:per').value)
+
+    return Response({
+        'done' : True,
+        'result' : {
+            'total_c' : total_c,
+            'cible_per' : cible_per,
+            'good' : True if (total_c / story.taille) > cible_per else False,
+            'cibleObj' : {
+                    'title' : "Aide-moi à mieux te connaître",
+                    'text' : "Je suis maintenant membre de StatusMax, et pour plus de statuts interessant, prends quelques secondes pour repondre à ce quiz afin de me permettre de mieux te connaître.",
+                    'url': get_value('quiz:link') + f'{story.pk}/',
+                    'dialogTitle' : "Invitez votre audience"
+                },
+            'must' : int(story.taille * cible_per)
+        }
     })

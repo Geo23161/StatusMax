@@ -45,5 +45,8 @@ urlpatterns = [
     path('get_stats/', get_stats, name="get_stats"),
     path('get_cpays/', get_cpays, name="get_cpays"),
     path('get_cparams/', get_cparams, name="get_cparams"),
-    path('delete_post/<int:id>/', delete_post, name="delete_post")
+    path('delete_post/<int:id>/', delete_post, name="delete_post"),
+    path('game_list/', game_list, name="game_list"),
+    path('set_games/', set_games, name= "set_games"),
+    path('cible_stats/<int:pk>/', cible_stats, name = "cible_stats")
 ]

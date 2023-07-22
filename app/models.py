@@ -65,7 +65,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_quart(self):
         return json.loads(self.quart)
 
-
 class Company(models.Model):
     users = models.ManyToManyField(
         User, null=True, blank=True, related_name="company_in")
@@ -112,6 +111,8 @@ class Interest(models.Model):
     box = models.ForeignKey("Interest", related_name="subs",
                             on_delete=models.CASCADE, null=True, blank=True)
 
+    def __str__(self) :
+        return self.name
 
 class ProductCat(models.Model):
     name = models.CharField(max_length=150, null=True, blank=True)
@@ -123,7 +124,7 @@ class Profession(models.Model):
     name = models.CharField(max_length=150, null=True, blank=True)
     box = models.ForeignKey("Profession", related_name="subs",
                             on_delete=models.CASCADE, null=True, blank=True)
-
+    
 
 class Campaign(models.Model):
     quart = models.TextField(null=True, blank=True)
@@ -190,6 +191,9 @@ class Post(models.Model):
     
     def get_media_typ(self) :
         return 'video' if self.media.is_vid() else 'image'
+
+    def price_10(self) :
+        return int(get_value('price:10:' + self.get_media_typ() + ':real'))
     
     def get_vid_url(self) :
         return self.media.vid_url() if self.get_media_typ() == 'video' else ''
@@ -221,7 +225,7 @@ class Post(models.Model):
         posted = self.already_posts()
         if not len(posted) :
             return ['En attente', 'gray']
-        if (self.total_invest - self.already_used) < int(GeoxDetails.objects.get(key = 'price:10').value) : 
+        if (self.total_invest - self.already_used) < int(GeoxDetails.objects.get(key = 'price:10:' + self.get_media_typ()).value) : 
             return ["Terminé", "blue"]
         return ["En cours (posté par " + str(len(posted)) + ")", "green"]
     
@@ -272,6 +276,10 @@ class UserStories(models.Model):
     proposed_posts = models.ManyToManyField(Post, related_name="in_stories")
     is_actif = models.BooleanField(default=True)
     momo = models.OneToOneField(MoMoCompte, null=True, blank=True, related_name="story", on_delete=models.PROTECT)
+    picture = models.TextField(null=True, blank=True)
+
+    def get_my_picture(self) :
+        return self.picture
 
     def price(self) :
         return int(GeoxDetails.objects.get(key = 'price:10').value)
@@ -356,6 +364,17 @@ class Payment(models.Model) :
     def get_momo(self) :
         return self.story.momo if self.story else 0
     
+
+class CibleF(models.Model) :
+    ip_address = models.CharField(max_length=150, null=True, blank=True)
+    story = models.ForeignKey(UserStories, related_name="cibles", on_delete=models.CASCADE)
+    interests = models.ManyToManyField(Interest, related_name="cibles", null=True, blank=True)
+    quart = models.TextField(null=True, blank=True)
+    created = models.DateTimeField(auto_now=True)
+    
+    def get_quart(self) :
+        return json.loads(self.quart)
+
 class Notifications(models.Model) :
     company = models.ForeignKey(Company, related_name="notifs", on_delete=models.CASCADE, null=True, blank=True)
     story = models.ForeignKey(UserStories, related_name="notifs", on_delete=models.CASCADE, null=True, blank=True)
@@ -438,7 +457,7 @@ class PostSerializer(serializers.ModelSerializer) :
     media = MediaSerializer()
     class Meta :
         model = Post
-        fields = ('id', 'media', 'get_bonus', 'get_title', 'get_desc', 'get_url', 'get_complete')
+        fields = ('id', 'media', 'get_bonus', 'get_title', 'get_desc', 'get_url', 'get_complete', "price_10")
 
 class InterestSerializers(serializers.ModelSerializer):
     class Meta:
@@ -478,8 +497,8 @@ def get_notif_data(user : User) :
         }
     }
     return json.dumps(data)
-"""
 
+"""
 def get_notif_data(user : User):
     data = {
         "messaging_product": "whatsapp",
@@ -569,7 +588,7 @@ def update_audiences(sender, instance : Post, **kwargs):
         for story in stories :
             story.proposed_posts.remove(instance)
         al_posts = instance.already_posts()
-        price_25 = int(GeoxDetails.objects.get(key = 'price:20').value)
+        price_25 = int(GeoxDetails.objects.get(key = 'price:20:' + instance.get_media_typ()).value)
         audiences = [ aud.story.pk for aud in  instance.campaign.audiences.all().order_by('-point') if not aud.story.pk in al_posts]
         stories_r = UserStories.objects.filter(pk__in= audiences)
         if ((instance.already_used - instance.already_payed ) >= price_25 and ( instance.already_payed != 0) ) or ((instance.already_payed == 0) and (instance.already_used - instance.already_payed) >= price_25 * 3 ) :
@@ -582,7 +601,7 @@ def update_audiences(sender, instance : Post, **kwargs):
             else :
                 CompanyPay.objects.create(amount = -(instance.already_used - instance.already_payed), company = instance.company, post = instance)
                 Post.objects.filter(pk = instance.pk).update(already_payed = instance.already_used)
-        if((instance.total_invest - instance.already_used) > int(GeoxDetails.objects.get(key ='price:10').value) ) :
+        if((instance.total_invest - instance.already_used) > int(GeoxDetails.objects.get(key ='price:10:' + instance.get_media_typ()).value) ) :
             for story in stories_r :
                 story.proposed_posts.add(instance)
                 last_notif : Notifications = story.notifs.all().order_by('-created_at').first()

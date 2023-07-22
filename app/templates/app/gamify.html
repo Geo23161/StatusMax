@@ -1,0 +1,369 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.css" rel="stylesheet" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="https://fonts.googleapis.com/css?family=PT+Serif" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'PT Serif', serif;
+        }
+
+        .d_sp {
+            margin-top: 0.5rem;
+        }
+
+        .d_sp:active {
+            background-color: rgb(240, 240, 240);
+        }
+
+        .card {
+            padding: 0.9rem;
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .norm {
+            border-width: 2px;
+            border-radius: 15px;
+            border-color: gray;
+        }
+
+        .activ {
+            border-radius: 15px;
+            border-width: 5px;
+            border-color: #5e17eb;
+        }
+
+        .gradient-background {
+            background-image: linear-gradient(90deg, transparent, #5e17eb55);
+            position: relative;
+            animation: gradientMovement 4s infinite alternate;
+            background-size: 200% 100%;
+        }
+
+        @keyframes gradientMovement {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        .fade-enter,
+        .fade-leave-to
+
+        /* .fade-leave-active in <2.1.8 */
+            {
+            opacity: 0;
+            transform: translateX(36px);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <nav class="bg-white border-gray-200 dark:bg-gray-900">
+            <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+                <a href="" class="flex items-center">
+                    <img src="{% static 'app/img/norm.png' %}" class="h-8 mr-3 rounded-lg" alt="Flowbite Logo" />
+                    <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">StatusMax</span>
+                </a>
+                <a href="{{app_link}}"
+                    class="mt-2 text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">Télécharger</a>
+            </div>
+        </nav>
+        <transition name="fade">
+            <div v-show="!stp" class=" py-3" style="padding-top: 5vh;">
+                <div class="flex " style="justify-content: space-around;">
+                    <div class="rounded-full"
+                        style=" width: 160px; height: 160px; border-width: 8px; border-color: #5e17eb; padding: 0.3rem;  ">
+                        <div
+                            style="background-size: cover; background-position: top center; width: 100%; height: 100%; border-radius: 100%; background-image: url('{{ story.get_my_picture }}'); ">
+
+                        </div>
+                    </div>
+
+                </div>
+                <div
+                    style="text-align: center; font-size: 1.3rem; font-weight: bold; padding-top: 1rem; padding-bottom: 0.5rem; ">
+                    {{story.user.name}}
+                </div>
+                <div class=" px-4" style=" text-align: center; font-size: 1.1rem;">
+
+                    Bonjour, je suis membre de StatusMax. Aidez-moi à mieux vous connaître en participant a ce petit
+                    quiz.
+                </div>
+                <div style="display: flex; justify-content: space-around; padding-top: 0.9rem;">
+                    <button @click="stp = 2" type="button"
+                        class=" text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80 font-medium rounded-lg px-5 py-2.5 text-center mr-2 mb-2 inline-flex items-center text-lg ">
+                        Démarrez
+                        <svg style="position: relative; top: 2px;" class="w-3.5 h-3.5 ml-2" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M1 5h12m0 0L9 1m4 4L9 9" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </transition>
+        <transition name="fade">
+            <div>
+                <div v-show="!boxl.length && stp == 1">
+                    <div class="text-center " style="padding: 3rem;">
+                        <div role="status">
+                            <svg aria-hidden="true"
+                                class="inline w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-purple-600"
+                                viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                    fill="currentColor" />
+                                <path
+                                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                    fill="currentFill" />
+                            </svg>
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div v-show="stp == 1 && boxl.length" style="margin-left: 0.9rem; margin-right: 0.9rem;">
+                    <div style="  border-radius: 15px; border-width: 3px; border-color: #5e17eb; padding: 0.5rem; text-align: center; "
+                        class="my-3 gradient-background">
+                        Choisissez les types de produits ou services qui vous interessent
+                    </div>
+                    <div style="padding-top: 1rem; padding-bottom: 1rem;">
+                        <div v-for="inter in boxl" :key="inter" class="d_sp card"
+                            :class="{ norm : !in_boxs(inter), activ : in_boxs(inter) }" @click="add_or_remove(inter)">
+                            <input :checked="in_boxs(inter)" :id="'default-radio-2:' + inter" disabled type="radio"
+                                :name="'default-radio:' + inter"
+                                class="w-6 h-6 text-purple-600 bg-gray-100 border-gray-300 focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 mr-3">
+                            <div style="font-size: 1.1rem;  ">
+                                ${ inter }
+                            </div>
+                        </div>
+
+                    </div>
+                    <div v-if="boxs.length" style="display: flex; justify-content: space-around; padding-top: 0.9rem;">
+                        <button @click="stp = 2" type="button"
+                            class=" text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80 font-medium rounded-lg px-5 py-2.5 text-center mr-2 mb-2 inline-flex items-center text-lg ">
+                            Suivant
+                            <svg style="position: relative; top: 2px;" class="w-3.5 h-3.5 ml-2" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+        <transition name="fade">
+            <div>
+                <div v-show="!actual.length && stp == 2" style="padding: 3rem;">
+                    <div class="text-center">
+                        <div role="status">
+                            <svg aria-hidden="true"
+                                class="inline w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-purple-600"
+                                viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                    fill="currentColor" />
+                                <path
+                                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                    fill="currentFill" />
+                            </svg>
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div v-show="stp == 2 && actual.length" style="margin-left: 0.9rem; margin-right: 0.9rem;">
+                    <div style="  border-radius: 15px; border-width: 3px; border-color: #5e17eb; padding: 0.5rem; text-align: center; "
+                        class="my-3 gradient-background">
+                        Choisissez dans la liste, les produits ou services qui vous interessent beaucoup
+                    </div>
+                    <div style="padding-top: 1rem; padding-bottom: 1rem;">
+                        <div v-show="registering">
+                            <div class="text-center">
+                                <div role="statsus">
+                                    <svg aria-hidden="true"
+                                        class="inline w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-purple-600"
+                                        viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                            fill="currentColor" />
+                                        <path
+                                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                            fill="currentFill" />
+                                    </svg>
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-show="!registering">
+                            <div v-for="inter in actual" :key="inter" class="d_sp card"
+                                :class="{ norm : !in_acts(inter), activ : in_acts(inter) }"
+                                @click="add_or_rem_a(inter)">
+                                <input :checked="in_acts(inter)" :id="'default-radio-2:' + inter" type="radio"
+                                    :name="'default-radio:' + inter"
+                                    class="w-6 h-6 text-purple-600 bg-gray-100 border-gray-300 focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 mr-3">
+                                <div style="font-size: 1.1rem;  ">
+                                    ${ inter }
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-around; padding-top: 0.9rem;">
+                            <button @click="post_game()" type="button"
+                                class=" text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80 font-medium rounded-lg px-5 py-2.5 text-center mr-2 mb-2 inline-flex items-center text-lg ">
+                                Suivant
+                                <svg style="position: relative; top: 2px;" class="w-3.5 h-3.5 ml-2" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+        <transition name="fade">
+            <div v-show="stp == 3" class=" py-3" style="padding-top: 5vh;">
+                <div class="flex " style="justify-content: space-around;">
+                    <div class="rounded-full"
+                        style=" width: 160px; height: 160px; border-width: 8px; border-color: #5e17eb; padding: 0.3rem;  ">
+                        <div
+                            style="background-size: cover; background-position: top center; width: 100%; height: 100%; border-radius: 100%; background-image: url('{{ story.get_my_picture }}'); ">
+
+                        </div>
+                    </div>
+
+                </div>
+                <div
+                    style="text-align: center; font-size: 1.3rem; font-weight: bold; padding-top: 1rem; padding-bottom: 0.5rem; ">
+                    {{story.user.name}}
+                </div>
+                <div class=" px-4" style=" text-align: center; font-size: 1.1rem;">
+
+                    Merci d'avoir participé à ce quiz. Cela me permet de vous connaître un peu mieux.
+                </div>
+
+            </div>
+        </transition>
+        <div class="flex" style="justify-content: space-around; ">
+            <img src="{% static 'app/img/dd.svg' %}" />
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+        integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.min.js"
+        integrity="sha512-Wbf9QOX8TxnLykSrNGmAc5mDntbpyXjOw9zgnKql3DgQ7Iyr5TCSPWpvpwDuo+jikYoSNMD9tRRH854VfPpL9A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        const { createApp, ref, computed, watch } = Vue
+
+        createApp({
+            delimiters: ['${', '}'],
+            setup() {
+                const stp = ref(0);
+                const boxl = ref([]);
+                const restd = ref();
+                const boxs = ref([]);
+                const rests = ref([]);
+                const post_game = async () => {
+                    for (inter of actual.value) restu.value.push(inter);
+                    registering.value = true
+                    const resp = await axios.post("{{api_post}}", {
+                        boxs: JSON.stringify(boxs.value),
+                        rests: JSON.stringify(rests.value),
+                        story : "{{story.pk}}",
+                    })
+                    if (resp.data['done']) {
+                        rests.value = []
+                        registering.value = false
+                        if (actual.value.length == 0) {
+                            stp.value = 3
+                            localStorage.setItem('done', `${resp.data['result']}`)
+                        }
+                    }
+                }
+                
+                const restu = ref([])
+                const actual_s = ref([]);
+
+                const all_inters = computed(() => {
+                    let rrs = [];
+                    for (const inter of boxl.value) {
+                        if (restu.value.filter(e => e == inter).length == 0) rrs = rrs.concat(restd.value[inter])
+                    }
+                    return rrs.filter(e => (restu.value.filter(el => el == e).length == 0))
+                })
+                function chooseRandomElements(list, numElements) {
+                    if (numElements > list.length) {
+                        return list.slice(); // Copie la liste complète si le nombre d'éléments demandés est supérieur à la taille de la liste
+                    }
+
+                    const shuffledList = list.slice().sort(() => 0.5 - Math.random()); // Mélange aléatoirement la liste
+                    return shuffledList.slice(0, numElements); // Retourne les 'numElements' premiers éléments de la liste mélangée
+                }
+
+                const actual = computed(() => {
+                    return chooseRandomElements(all_inters.value, 7)
+                })
+                const in_boxs = (inter) => {
+                    return boxs.value.filter((e) => e == inter).length > 0
+                }
+                const in_acts = (inter) => {
+                    return rests.value.filter((e) => e == inter).length > 0
+                }
+                const add_or_remove = (inter) => {
+                    if (in_boxs(inter)) boxs.value = boxs.value.filter(e => e != inter);
+                    else boxs.value.push(inter)
+                }
+                const add_or_rem_a = (inter) => {
+                    if (in_acts(inter)) rests.value = rests.value.filter(e => e != inter);
+                    else rests.value.push(inter)
+                }
+                const get_lists = async () => {
+                    const resp = await axios.get('{{api_get}}')
+                    if (resp.data['done']) {
+                        boxl.value = resp.data['result'].box_list
+                        restd.value = resp.data['result'].rest_dic
+                    }
+                }
+                const registering = ref(false)
+                
+                get_lists()
+
+                return {
+                    stp,
+                    boxl,
+                    restd,
+                    boxs,
+                    in_boxs,
+                    add_or_remove,
+                    all_inters,
+                    rests,
+                    actual,
+                    actual_s,
+                    in_acts,
+                    add_or_rem_a,
+                    post_game
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+
+</html>
