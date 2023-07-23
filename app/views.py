@@ -864,7 +864,8 @@ def gamify_interest(request, pk) :
         'story' : story,
         'app_link' : GeoxDetails.objects.get(key= 'app:link').value,
         'api_get' : api_get,
-        'api_post' : api_post
+        'api_post' : api_post,
+        'url': get_value('quiz:link') + f'{story.pk}/',
     })
 
 @api_view(['GET'])

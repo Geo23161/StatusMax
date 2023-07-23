@@ -6,6 +6,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.css" rel="stylesheet" />
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
     <link href="https://fonts.googleapis.com/css?family=PT+Serif" rel="stylesheet">
+    <title>{{ story.user.name }} | StatusMax</title>
+    <meta name="description" content="Bonjour, je suis membre de StatusMax. Aidez-moi à mieux vous connaître en participant a ce petit quiz." />
+    <meta property="og:title" content="{{ story.user.name }} | StatusMax" />
+    <meta property="og:url" content="{{ url }}" />
+    <meta property="og:description" content="Bonjour, je suis membre de StatusMax. Aidez-moi à mieux vous connaître en participant a ce petit quiz." />
+    <meta property="og:image" content="{{story.get_my_picture}}" />
     <style>
         body {
             font-family: 'PT Serif', serif;
