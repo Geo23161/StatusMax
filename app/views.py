@@ -188,7 +188,7 @@ def create_stories(request):
         story.d_interest.add(interest)
     for prof in my_profs:
         story.professions.add(prof)
-    media_id = request.data.get('media_typ')
+    media_id = request.data.get('media_id')
     if int(media_id) :
         media = MediaPost.objects.get(pk = int(media_id))
         story.picture = media.image.url
