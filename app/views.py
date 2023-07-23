@@ -177,8 +177,14 @@ def create_stories(request):
     my_interests = [p['id'] for p in json.loads(request.data.get('interests'))]
     my_profs = [p['id'] for p in json.loads(request.data.get('professions'))]
     story = UserStories.objects.get_or_create(user=request.user)[0]
+    story.taille = int(taille)
+    story.min_age = int(ages['lower'])
+    story.max_age = int(ages['upper'])
+    """
     stories = UserStories.objects.filter(pk__in=[story.pk])
-    stories = stories.update(taille=int(taille), min_age=int(ages['lower']), max_age=int(ages['upper']))
+    stories = stories.update(taille=int(taille), men_per=int(taille) - int(girls_num),
+                             wmen_per=int(girls_num), min_age=int(ages['lower']), max_age=int(ages['upper']))
+    """
     for interest in story.d_interest.all():
         story.d_interest.remove(interest)
     for prof in story.professions.all():
@@ -191,7 +197,7 @@ def create_stories(request):
     if int(media_id) :
         media = MediaPost.objects.get(pk = int(media_id))
         story.picture = media.image.url
-        story.save()
+    story.save()
     def find_audiences():
         story = UserStories.objects.get_or_create(user=request.user)[0]
         for campaign in Campaign.objects.all():
