@@ -29,7 +29,7 @@ def get_new_point(story, campaign) :
     if not my_dic['point'] and GeoxDetails.objects.filter(key = 'is:strict').exists()  :
         return my_dic
     cib_c = cibles.count() if cibles.count() else 1
-    my_dic['point'] += int(sum(distances) / (cibles.count()))
+    my_dic['point'] += int(sum(distances) / (cib_c))
     ages_intersec =len( set(range(story.min_age, story.max_age + 1)).intersection(range(campaign.min_age, campaign.max_age + 1)))
     my_dic['point'] += 1 if ages_intersec > 10 else (0.8 if ages_intersec > 5 else 0.5)
     my_dic['point'] += 1 if len(story.professions.all() & campaign.professions.all()) >= 1 else 0.5
