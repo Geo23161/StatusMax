@@ -22,7 +22,7 @@ def send_by_thread(func):
 def get_value(key) -> str:
     return GeoxDetails.objects.get(key=key).value
 
-IS_DEV = True
+IS_DEV = False
 
 
 class CustomUserManager(BaseUserManager):
