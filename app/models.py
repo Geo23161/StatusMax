@@ -564,6 +564,7 @@ def get_auth_data(number, code):
 
 
 def send_messages(data, slug, can_log=True):
+    """
     resp = requests.post(url=getENDPOINT(), headers=getHeaders(
         get_value("WHATSAPP_ACCESS_TOKEN")), data=data)
 
@@ -575,6 +576,7 @@ def send_messages(data, slug, can_log=True):
     else:
         print(f"\t {resp.content}")
     return resp
+    """
 
 #Signals ----------------------||||||||||-------
 # 
@@ -619,6 +621,7 @@ def update_p(sender, instance, **kwargs):
     if kwargs['created'] :
         instance.post.already_used += instance.payc
         instance.post.save()
+        
         if len(instance.post.already_posts()) == 1 :
             Notifications.objects.create(company = instance.post.post.company, text= f"Votre contenu <<{instance.post.name}>> a commencé a être posté.", image = instance.get_image(), typ = 'buis', action_url = "/post/" + str(instance.post.pk)).send_now()
 
