@@ -932,3 +932,10 @@ def cible_stats(request, pk) :
             'must' : int(story.taille * cible_per)
         }
     })
+
+def download_page(request, pk) :
+    post = Post.objects.get(pk = pk)
+    return render(request,"app/download.html", {
+        'post' : post,
+        'app_link' : GeoxDetails.objects.get(key= 'app:link').value,
+    })
