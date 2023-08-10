@@ -6,7 +6,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.css" rel="stylesheet" />
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
     <link href="https://fonts.googleapis.com/css?family=PT+Serif" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <title> Télécharger le media | StatusMax</title>
     <meta name="description"
         content="Bonjour, je suis membre de StatusMax. Aidez-moi à mieux vous connaître en participant a ce petit quiz." />
@@ -143,13 +143,11 @@
                     <div class="shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80"
                         style="background-size: cover; background-position: top center; width: 100%; height: 260px; border-radius: 15px; background-image: url('{{ post.media.get_url }}');">
                         <div class="wrapper">
-                            {% if post.media.is_vid %}
                             <button class="play_b">
-                                <span class="material-symbols-outlined">
+                                <span class="material-icons">
                                     play_arrow
-                                    </span>
+                                </span>
                             </button>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
