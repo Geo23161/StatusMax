@@ -326,10 +326,9 @@ def post_post(request):
             'reason' : "La somme restante pour ce post ne peut que vous payez pour un nombre de vue inférieure à " + str(int((post.total_invest - post.already_used)/my_story.price() * 10)) + "."
         })
     accepted = AcceptedPost.objects.create(
-        post=post, story=my_story, goals=goal, payc=int(my_story.price() * goal / 10))
+        post=post, story=my_story, goals=goal, payc=int(int(GeoxDetails.objects.get(key ='price:10:' + post.get_media_typ()).value) * goal / 10))
     my_story.proposed_posts.remove(post)
     my_story.save()
-
     return Response({
         'done': True,
         'result': accepted.pk
