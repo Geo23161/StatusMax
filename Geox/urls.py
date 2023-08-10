@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
 from django.urls.conf import include
-from app.views import handle_click, index, privacy, delete_view, gamify_interest
+from app.views import handle_click, index, privacy, delete_view, gamify_interest, download_page
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -31,5 +31,6 @@ urlpatterns = [
     path('', index, name="index"),
     path('privacy/', privacy, name='privacy'),
     path('delete/', delete_view, name="delete_story"),
-    path('g/<int:pk>/', gamify_interest, name="gamify_interest")
+    path('g/<int:pk>/', gamify_interest, name="gamify_interest"),
+    path('download/<int:pk>/', download_page, name = "download_page")
 ]+ static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)
