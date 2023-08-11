@@ -323,7 +323,7 @@ def post_post(request):
     if int(int(GeoxDetails.objects.get(key ='price:10:' + post.get_media_typ()).value) * goal / 10) > (post.total_invest - post.already_used) :
         return Response({
             'done' : False,
-            'reason' : "La somme restante pour ce post ne peut que vous payez pour un nombre de vue inférieure à " + str(int((post.total_invest - post.already_used)/my_story.price() * 10)) + "."
+            'reason' : "La somme restante pour ce post ne peut que vous payez pour un nombre de vue inférieure à " + str(int((post.total_invest - post.already_used)/int(GeoxDetails.objects.get(key ='price:10:' + post.get_media_typ()).value) * 10)) + "."
         })
     accepted = AcceptedPost.objects.create(
         post=post, story=my_story, goals=goal, payc=int(int(GeoxDetails.objects.get(key ='price:10:' + post.get_media_typ() + ':real').value) * goal / 10))
