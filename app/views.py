@@ -320,7 +320,7 @@ def post_post(request):
     
     goal = int(request.data.get('goal'))
     my_story = UserStories.objects.get(user=request.user)
-    if int(my_story.price() * goal / 10) > (post.total_invest - post.already_used) :
+    if int(int(GeoxDetails.objects.get(key ='price:10:' + post.get_media_typ()).value) * goal / 10) > (post.total_invest - post.already_used) :
         return Response({
             'done' : False,
             'reason' : "La somme restante pour ce post ne peut que vous payez pour un nombre de vue inférieure à " + str(int((post.total_invest - post.already_used)/my_story.price() * 10)) + "."

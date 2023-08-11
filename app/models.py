@@ -619,7 +619,8 @@ def update_audiences(sender, instance : Post, **kwargs):
 @receiver(post_save, sender=AcceptedPost)
 def update_p(sender, instance, **kwargs):
     if kwargs['created'] :
-        instance.post.already_used += instance.payc
+        money = int(int(GeoxDetails.objects.get(key ='price:10:' + post.get_media_typ()).value) / int(GeoxDetails.objects.get(key ='price:10:' + post.get_media_typ() + ':real').value) * instance.payc)
+        instance.post.already_used += money
         instance.post.save()
         
         if len(instance.post.already_posts()) == 1 :
