@@ -706,7 +706,7 @@ def get_min_pay(request):
     min_pay = 0
     proposed = 0
     for post in posts:
-        if post.get_status()[0] != "Terminé":
+        if post.get_status()[0] != "En cours (sur statut)":
             price_25 = int(GeoxDetails.objects.get(key = 'price:20:' + post.get_media_typ()).value)
             min_pay += (post.already_used - post.already_payed)
             proposed += (post.total_invest - post.already_payed) if post.already_used > price_25 * 2.9 else 0
@@ -822,7 +822,7 @@ def get_stats(request):
         views += post.get_seen()
         clicks += post.clicks
         post_start += 1
-        if post.get_status()[0] == "Terminé":
+        if post.get_status()[0] == "En cours (sur statut)":
             post_ended += 1
         posts_p += len(post.already_posts())
     return Response({
@@ -854,7 +854,7 @@ def get_cparams(request):
     company = request.user.company_in.all().first()
     min_pay = 0
     for post in company.posts.all():
-        if post.get_status()[0] != "Terminé":
+        if post.get_status()[0] != "En cours (sur statut)":
             min_pay += (post.already_used - post.already_payed) 
     min_pay -= company.get_amount()
     params = {

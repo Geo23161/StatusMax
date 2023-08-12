@@ -233,7 +233,9 @@ class Post(models.Model):
         if not len(posted) :
             return ['En attente', 'gray']
         if (self.total_invest - self.already_used) < int(GeoxDetails.objects.get(key = 'price:10:' + self.get_media_typ()).value) : 
-            return ["Terminé", "blue"]
+            return ["En cours (sur statut)", "blue"]
+        if (self.get_seen() / (self.get_predicted() if self.get_predicted() else 1)) > 0.8 :
+            return ["Terminé", "orange"]
         return ["En cours (posté par " + str(len(posted)) + ")", "green"]
     
     def get_seen(self) :
