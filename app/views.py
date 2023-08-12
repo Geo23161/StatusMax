@@ -156,14 +156,14 @@ def check_code(request):
     number = request.data.get('number')
     sent = check_code_mess(number, code)
     if sent :
+        request.user.whatsapp = number
+        request.user.save()
         return Response({
             'done': True
         })
     """
     gd = GeoxDetails.objects.filter(
         key="code:user:" + str(request.user.pk), value=code)
-    request.user.whatsapp = number
-    request.user.save()
     if gd.exists():
         gd.delete()
         return Response({
