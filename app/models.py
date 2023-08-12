@@ -186,6 +186,13 @@ class Post(models.Model):
     already_used = models.IntegerField(default=0)
     already_payed = models.IntegerField(default=0)
     click_ips = models.TextField(null=True, blank=True, default="[]")
+
+    def get_prospects(self) :
+        try :
+            return json.loads(get_value('prospects'))[f'post:{self.pk}']
+        except :
+            return []
+
     def get_bonus(self) :
         return 0
     
@@ -419,7 +426,7 @@ class PostDetailSerializer(serializers.ModelSerializer) :
     campaign = CampaignSerializer()
     class Meta :
         model = Post
-        fields = ('id', 'get_status', 'name', 'get_image', 'get_seen', 'get_predicted', 'clicks', 'get_media_typ', 'text', 'real_url', 'already_used', 'status_number', 'total_invest', 'campaign', 'get_preuve', 'get_vid_url' )
+        fields = ('id', 'get_status', 'name', 'get_image', 'get_seen', 'get_predicted', 'clicks', 'get_media_typ', 'text', 'real_url', 'already_used', 'status_number', 'total_invest', 'campaign', 'get_preuve', 'get_vid_url', "get_prospects" )
 
 class PostBuisSerializer(serializers.ModelSerializer) :
     class Meta :

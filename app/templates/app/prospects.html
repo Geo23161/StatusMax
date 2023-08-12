@@ -1,0 +1,173 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.css" rel="stylesheet" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="https://fonts.googleapis.com/css?family=PT+Serif" rel="stylesheet">
+    <title>StatusMax | {{post.name}} </title>
+    <meta name="description" content="{{ post.get_complete }}" />
+    <meta property="og:title" content="{{ post.name }} | StatusMax" />
+    <meta property="og:url" content="{{ url }}" />
+    <meta property="og:description" content="{{post.get_complete}}" />
+    <meta property="og:image" content="{{post.media.get_url}}" />
+    <style>
+        body {
+            font-family: 'PT Serif', serif;
+        }
+
+        .d_sp {
+            margin-top: 0.5rem;
+        }
+
+        .d_sp:active {
+            background-color: rgb(240, 240, 240);
+        }
+
+        .card {
+            padding: 0.9rem;
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .norm {
+            border-width: 2px;
+            border-radius: 15px;
+            border-color: gray;
+        }
+
+        .activ {
+            border-radius: 15px;
+            border-width: 5px;
+            border-color: #5e17eb;
+        }
+
+        .gradient-background {
+            background-image: linear-gradient(90deg, transparent, #5e17eb55);
+            position: relative;
+            animation: gradientMovement 4s infinite alternate;
+            background-size: 200% 100%;
+        }
+
+        @keyframes gradientMovement {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        .fade-enter,
+        .fade-leave-to
+
+        /* .fade-leave-active in <2.1.8 */
+            {
+            opacity: 0;
+            transform: translateX(36px);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50" >
+    <div id="app">
+        <nav class="bg-white border-gray-200 dark:bg-gray-900">
+            <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+                <a href="" class="flex items-center">
+                    <img src="{% static 'app/img/norm.png' %}" class="h-8 mr-3 rounded-lg" alt="Flowbite Logo" />
+                    <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">StatusMax</span>
+                </a>
+                <a href="{{app_link}}"
+                    class="mt-2 text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">Télécharger</a>
+            </div>
+        </nav>
+        <transition name="fade">
+            <div class=" py-3" style="padding-top: 45%;">
+                <form method="post" action="" id="tform" >
+                    {% csrf_token %}
+                    <div
+                        style="text-align: center; font-size: 1.6rem; font-weight: bold; padding-top: 1rem; padding-bottom: 0.5rem; ">
+                        Numéro whatsapp
+                    </div>
+                    <div style="padding: 0.6rem 1.6rem;">
+                        <div class="relative mb-6">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+
+                                <svg class="w-4 h-4" height="800px" width="800px" version="1.1" id="Capa_1"
+                                    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                    viewBox="0 0 58 58" xml:space="preserve">
+                                    <g>
+                                        <path style="fill:#2CB742;" d="M0,58l4.988-14.963C2.457,38.78,1,33.812,1,28.5C1,12.76,13.76,0,29.5,0S58,12.76,58,28.5
+		S45.24,57,29.5,57c-4.789,0-9.299-1.187-13.26-3.273L0,58z" />
+                                        <path style="fill:#FFFFFF;" d="M47.683,37.985c-1.316-2.487-6.169-5.331-6.169-5.331c-1.098-0.626-2.423-0.696-3.049,0.42
+		c0,0-1.577,1.891-1.978,2.163c-1.832,1.241-3.529,1.193-5.242-0.52l-3.981-3.981l-3.981-3.981c-1.713-1.713-1.761-3.41-0.52-5.242
+		c0.272-0.401,2.163-1.978,2.163-1.978c1.116-0.627,1.046-1.951,0.42-3.049c0,0-2.844-4.853-5.331-6.169
+		c-1.058-0.56-2.357-0.364-3.203,0.482l-1.758,1.758c-5.577,5.577-2.831,11.873,2.746,17.45l5.097,5.097l5.097,5.097
+		c5.577,5.577,11.873,8.323,17.45,2.746l1.758-1.758C48.048,40.341,48.243,39.042,47.683,37.985z" />
+                                    </g>
+                                </svg>
+                            </div>
+                            <input type="text" id="whatsapp_s" name="whatsapp" required
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Ex : 61000000">
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-around; ">
+                        <button onclick="save_()"
+                            class=" text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80 font-medium rounded-lg px-5 py-2.5 text-center mr-2 mb-2 inline-flex items-center text-xl ">
+                            Continuer
+                            <svg style="position: relative; top: 2px;" class="w-3.5 h-3.5 ml-2" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </transition>
+
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+            integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.min.js"
+            integrity="sha512-Wbf9QOX8TxnLykSrNGmAc5mDntbpyXjOw9zgnKql3DgQ7Iyr5TCSPWpvpwDuo+jikYoSNMD9tRRH854VfPpL9A=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+        <script >
+            const whatsapp = localStorage.getItem('whatsapp_statusmax')
+
+            const submit_form = () => {
+                const form_p = document.getElementById("tform")
+                form_p.submit()
+            }
+ 
+            const save_ = () => {
+                const inp = document.getElementById("whatsapp_s") 
+                localStorage.setItem('whatsapp_statusmax', inp.value)
+                submit_form()
+            }
+
+            if(whatsapp){
+                const inp = document.getElementById("whatsapp_s") 
+                console.log(inp)
+                if(inp) {
+                    inp.value = whatsapp
+                    save_()
+                }
+            }
+        </script>
+
+</body>
+
+</html>

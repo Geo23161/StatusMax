@@ -11,6 +11,45 @@ from .ip2location import get_quart
 from .algo import set_audiences,  get_new_point
 from .core import Kkiapay
 import time
+from twilio.rest import Client
+
+class TwilioAg :
+
+    def __init__(self, account_sid, auth_sid, service_sid) :
+        self.account_sid = account_sid
+        self.auth_sid = auth_sid
+        self.service_sid = service_sid
+        self.client = Client(self.account_sid, self.auth_sid)
+
+    def send_verify(self, number) :
+        self.client.verify \
+        .services(self.service_sid) \
+        .verifications \
+        .create(to=number, channel='whatsapp')
+
+    def check_code(self, number, code) -> bool :
+        check = self.client.verify \
+            .services(self.service_sid) \
+            .verification_checks \
+            .create(to=number, code=code)    
+        return check.status == 'approved'
+
+def send_verify_mess(number) :
+    twil = TwilioAg(get_value('twilio_as'), get_value('twilio_us'), get_value('twilio_ss'))
+    try :
+        twil.send_verify(number)
+        return True
+    except Exception as e :
+        print(e)
+        return False
+    
+def check_code_mess(number, code) :
+    twil = TwilioAg(get_value('twilio_as'), get_value('twilio_us'), get_value('twilio_ss'))
+    try :
+        return twil.check_code(number, code)
+    except :
+        return False
+        
 
 pays_codes_indicatifs = {
     "BJ": "+229",
@@ -87,16 +126,20 @@ def whatsapp_auth(request):
                 'reason' : 'Ce numero whatsapp a déja été utilisé.'
             })
     number = pays_codes_indicatifs[country] + number
+    sent = send_verify_mess(number)
+    if not sent :
+        return Response({
+            'done': False,
+            'reason': "Le numero whatsapp " + number + " est invalide."
+        })
+    """
     gd = GeoxDetails.objects.create(
         key="code:user:" + str(request.user.pk), value=get_unique_code())
     try:
         send_messages(get_auth_data(number, gd.value), 'auth', can_log=False)
     except Exception as e:
-        print(e)
-        return Response({
-            'done': False,
-            'reason': "Le numero whatsapp " + number + " est invalide."
-        })
+        print(e)"""
+        
     request.user.uwhatsapp = number
     request.user.save()
     return Response({
@@ -111,6 +154,12 @@ def whatsapp_auth(request):
 def check_code(request):
     code = request.data.get('code')
     number = request.data.get('number')
+    sent = check_code_mess(number, code)
+    if sent :
+        return Response({
+            'done': True
+        })
+    """
     gd = GeoxDetails.objects.filter(
         key="code:user:" + str(request.user.pk), value=code)
     request.user.whatsapp = number
@@ -119,7 +168,7 @@ def check_code(request):
         gd.delete()
         return Response({
             'done': True
-        })
+        })"""
     return Response({
         'done': False
     })
@@ -735,7 +784,26 @@ def handle_click(request, id):
         already_ips.append(ip)
         Post.objects.filter(pk=post.pk).update(
             clicks=post.clicks + 1, click_ips=json.dumps(already_ips))
-    return redirect(post.real_url)
+    if request.method == "POST" :
+        whatsapp = request.POST.get('whatsapp')
+        try :
+            my_dic = json.loads(get_value('propects'))
+        except :
+            my_dic = {}
+        if not f"post:{post.pk}" in my_dic.keys() :
+            my_dic[f"post:{post.pk}"] = [whatsapp]
+        else :
+            my_dic[f"post:{post.pk}"].append(whatsapp) if not whatsapp in my_dic[f"post:{post.pk}"] else 0
+        gd = GeoxDetails.objects.get_or_create(key= 'prospects')[0]
+        gd.value = json.dumps(my_dic)
+        gd.save()
+        return redirect(post.real_url)
+    return render(request,"app/prospects.html", {
+        'post' : post,
+        'app_link' : GeoxDetails.objects.get(key= 'app:link').value,
+        "url" : "htpps://business.statusmax.site/p/" + str(id) + "/"
+    })
+    #return redirect(post.real_url)
 
 
 @api_view(['GET'])
