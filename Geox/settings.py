@@ -110,7 +110,6 @@ if os.environ.get("ENV") == "PRODUCTION" :
 
 AUTH_USER_MODEL = "app.User"
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
