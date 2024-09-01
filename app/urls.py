@@ -10,7 +10,7 @@ router.register('devices', FCMDeviceAuthorizedViewSet)
 urlpatterns = [
 	path("ping/", ping, name="ping"),
     path("search_place/<str:name>/", search_place, name="search_place"),
-    path("register", register_view, name = "register_view"),
+    path("register/", register_view, name = "register_view"),
     path("whatsapp_auth/", whatsapp_auth, name="whatsapp_auth"),
     path("check_code/", check_code, name="check_code"),
     path("get_stp/", get_register_stp, name="get_register_stp"),
